@@ -23,5 +23,6 @@ environment:
 
 init:
 - git --version
+- git config --global --add core.longpaths true
 
 test: off
