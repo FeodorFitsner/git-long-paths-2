@@ -19,46 +19,6 @@ environment:
       PYTHON_VERSION: "2.7"
       MINICONDAPATH: "C:\\Miniconda"
 
-    - platform: x64
-      PYTHON_ROOT: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7"
-      MINICONDAPATH: "C:\\Miniconda-x64"
-
-#   TODO to be fixed, seems like some matplotlib problem
-#    - platform: x86
-#      PYTHON_ROOT: "C:\\Python33"
-#      PYTHON_VERSION: "3.3"
-#      MINICONDAPATH: "C:\\Miniconda3"
-#
-#    - platform: x64
-#      PYTHON_ROOT: "C:\\Python33-x64"
-#      PYTHON_VERSION: "3.3"
-#      MINICONDAPATH: "C:\\Miniconda3-x64"
-
-#   dropping Python 3.4 support for Windows, to get faster builds https://github.com/pytrip/pytrip/issues/267
-#    - platform: x86
-#      PYTHON_ROOT: "C:\\Python34"
-#      PYTHON_VERSION: "3.4"
-#      MINICONDAPATH: "C:\\Miniconda3"
-#
-#    - platform: x64
-#      PYTHON_ROOT: "C:\\Python34-x64"
-#      PYTHON_VERSION: "3.4"
-#      MINICONDAPATH: "C:\\Miniconda3-x64"
-
-# Python3.5 needs VS 14.0 (2015)
-    - platform: x86
-      PYTHON_ROOT: "C:\\Python35"
-      PYTHON_VERSION: "3.5"
-      MINICONDAPATH: "C:\\Miniconda35"
-      os: Visual Studio 2015
-
-    - platform: x64
-      PYTHON_ROOT: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5"
-      MINICONDAPATH: "C:\\Miniconda35-x64"
-      os: Visual Studio 2015
-
 init:
 # add Python interpreter to PATH variable
   - set PATH=%PYTHON_ROOT%;%PYTHON_ROOT%\Scripts;%PATH%
@@ -71,44 +31,4 @@ init:
 # check 32 or 64 bit
   - python -c "import struct;print(8 * struct.calcsize('P'))"
 
-install:
-# tell miniconda to always follow default answers
-  - conda config --set always_yes yes --set changeps1 no
-# update miniconda
-  - conda update -q conda
-# create new conda workspace and activate it
-  - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION%
-  - activate python%PYTHON_VERSION%
-# as scipy doesn't yet have wheels for windows, install it using conda
-  - conda install -q --name python%PYTHON_VERSION% "scipy<0.20"
-# install usual requirements
-  - pip install --upgrade -r tests/requirements-test.txt
-  - pip install --upgrade -r requirements.txt
-# check numpy & scipy versions
-  - python -c "import numpy as np;print(np.version.version)"
-  - python -c "import scipy as sp;print(sp.version.version)"
-# check python version
-  - python -V
-# check 32 or 64 bit
-  - python -c "import struct;print(8 * struct.calcsize('P'))"
-
-test_script:
-# generate versioneer stuff
-  - python %MINICONDAPATH%/envs/python%PYTHON_VERSION%/Scripts/versioneer install
-# make wheel package
-  - python setup.py bdist_wheel
-# clean build directory
-  - rd /s /q build
-# install generated package
-  - cd dist
-  - python -c "import os; import pip; pip.main(['install', os.listdir('.')[0]]);"
-  - cd ..
-# run tests (normal py.test command results in memory error on appveyor, so we run tests file-by-file)
-  - FOR %%I in (tests\test*.py) DO python -m pytest %%I
-# deploy package
-  - bash appveyor\deploy_package.sh
-
-# upload artifacts
-# disabling to save the space
-#artifacts:
-#  - path: dist\*whl
+test: off
