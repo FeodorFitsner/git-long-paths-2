@@ -1,5 +1,7 @@
 # validation page for appveyor config: https://ci.appveyor.com/tools/validate-yaml
 
+image: Previous Visual Studio 2015
+
 # build Configuration, i.e. Debug, Release, etc.
 configuration: Release
 
