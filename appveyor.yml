@@ -23,6 +23,5 @@ environment:
 
 init:
 - git --version
-- "git config --system http.sslcainfo \"C:\\Program Files\\Git\\mingw64\\ssl\\certs\\ca-bundle.crt\""
 
 test: off
